@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shooting Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #001133;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            display: block;
+            background: linear-gradient(to bottom, #001133, #003366);
+        }
+        #gameUI {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        #pauseBtn, #editCharacterBtn, #editVillainsBtn {
+            position: fixed;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 5px;
+            margin-right: 20px;
+        }
+        #pauseBtn {
+            top: 20px;
+            right: 20px;
+        }
+        #editCharacterBtn {
+            top: 20px;
+            right: 100px;
+        }
+        #editVillainsBtn {
+            top: 20px;
+            right: 230px;
+        }
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            z-index: 1000;
+            min-width: 300px;
+        }
+        .character-grid, .villains-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .character-option, .villain-option {
+            font-size: 40px;
+            padding: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .character-option:hover, .villain-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+        .character-option.selected, .villain-option.selected {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #00ff00;
+        }
+        .modal button {
+            padding: 10px 25px;
+            margin: 10px;
+            background: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .modal button:hover {
+            background: #45a049;
+        }
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="gameUI">Score: <span id="scoreDisplay">0</span></div>
+    <button id="pauseBtn">Pause</button>
+    <button id="editCharacterBtn">Edit Character</button>
+    <button id="editVillainsBtn">Edit Villains</button>
+
+    <div id="overlay" style="display: none;"></div>
+    <div id="characterModal" class="modal" style="display: none;">
+        <h2>Choose Your Character</h2>
+        <div class="character-grid">
+            <div class="character-option" data-character="🛩️">🛩️</div>
+            <div class="character-option" data-character="🚀">🚀</div>
+            <div class="character-option" data-character="🛸">🛸</div>
+            <div class="character-option" data-character="🗡️">🗡️</div>
+            <div class="character-option" data-character="🦅">🦅</div>
+            <div class="character-option" data-character="🐉">🐉</div>
+            <div class="character-option" data-character="🦸">🦸</div>
+            <div class="character-option" data-character="🤖">🤖</div>
+        </div>
+        <button id="startGameBtn">Start Game</button>
+    </div>
+
+    <div id="villainsModal" class="modal" style="display: none;">
+        <h2>Choose Your Villains</h2>
+        <div class="villains-grid">
+            <div class="villain-option" data-villain="👾">👾</div>
+            <div class="villain-option" data-villain="👻">👻</div>
+            <div class="villain-option" data-villain="👽">👽</div>
+            <div class="villain-option" data-villain="🤖">🤖</div>
+            <div class="villain-option" data-villain="😈">😈</div>
+            <div class="villain-option" data-villain="🦹">🦹</div>
+            <div class="villain-option" data-villain="💀">💀</div>
+            <div class="villain-option" data-villain="🧟">🧟</div>
+        </div>
+        <button id="saveVillainsBtn">Save Villains</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        let selectedVillains = ['👾', '👻', '👽', '🤖', '😈'];
+        const bulletEmoji = '💥';
+        
+        let selectedCharacter = '🛩️';
+        let isGameStarted = false;
+        
+        const gun = { 
+            x: canvas.width / 2, 
+            y: canvas.height - 50, 
+            width: 50, 
+            height: 50,
+            emoji: selectedCharacter
+        };
+        
+        let bullets = [];
+        let enemies = [createEnemy()];
+        let score = 0;
+        let isPaused = false;
+
+        // Character and villain selection logic
+        const characterModal = document.getElementById('characterModal');
+        const villainsModal = document.getElementById('villainsModal');
+        const overlay = document.getElementById('overlay');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const editCharacterBtn = document.getElementById('editCharacterBtn');
+        const editVillainsBtn = document.getElementById('editVillainsBtn');
+        const saveVillainsBtn = document.getElementById('saveVillainsBtn');
+        const characterOptions = document.querySelectorAll('.character-option');
+        const villainOptions = document.querySelectorAll('.villain-option');
+
+        characterOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                characterOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedCharacter = option.dataset.character;
+                gun.emoji = selectedCharacter;
+            });
+        });
+
+        villainOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                option.classList.toggle('selected');
+            });
+        });
+
+        function showCharacterModal() {
+            characterModal.style.display = 'block';
+            villainsModal.style.display = 'none';
+            overlay.style.display = 'block';
+            isPaused = true;
+        }
+
+        function showVillainsModal() {
+            villainsModal.style.display = 'block';
+            characterModal.style.display = 'none';
+            overlay.style.display = 'block';
+            isPaused = true;
+        }
+
+        function hideModals() {
+            characterModal.style.display = 'none';
+            villainsModal.style.display = 'none';
+            overlay.style.display = 'none';
+            isPaused = false;
+            if (!isGameStarted) {
+                isGameStarted = true;
+                gameLoop();
+            }
+        }
+
+        function saveVillains() {
+            const selectedOptions = document.querySelectorAll('.villain-option.selected');
+            if (selectedOptions.length > 0) {
+                selectedVillains = Array.from(selectedOptions).map(option => option.dataset.villain);
+            }
+            hideModals();
+        }
+
+        startGameBtn.addEventListener('click', hideModals);
+        editCharacterBtn.addEventListener('click', showCharacterModal);
+        editVillainsBtn.addEventListener('click', showVillainsModal);
+        saveVillainsBtn.addEventListener('click', saveVillains);
+
+        // Show character selection on initial load
+        showCharacterModal();
+        
+        function createEnemy() {
+            return {
+                x: Math.random() * (canvas.width - 40),
+                y: 50,
+                width: 40,
+                height: 40,
+                speed: 2,
+                emoji: selectedVillains[Math.floor(Math.random() * selectedVillains.length)]
+            };
+        }
+        
+        const scoreDisplay = document.getElementById("scoreDisplay");
+        const pauseBtn = document.getElementById("pauseBtn");
+
+        function drawEmoji(emoji, x, y, size) {
+            ctx.font = `${size}px Arial`;
+            ctx.fillText(emoji, x, y);
+        }
+
+        function drawGun() {
+            drawEmoji(gun.emoji, gun.x, gun.y, 40);
+        }
+        
+        function drawBullets() {
+            bullets.forEach((bullet, index) => {
+                drawEmoji(bulletEmoji, bullet.x, bullet.y, 20);
+                bullet.y -= 8;
+                if (bullet.y < 0) bullets.splice(index, 1);
+            });
+        }
+        
+        function drawEnemies() {
+            enemies.forEach((enemy, index) => {
+                drawEmoji(enemy.emoji, enemy.x, enemy.y, 40);
+                enemy.y += enemy.speed;
+                if (enemy.y > canvas.height) {
+                    enemies.splice(index, 1);
+                    enemies.push(createEnemy());
+                }
+            });
+        }
+        
+        function checkCollisions() {
+            bullets.forEach((bullet, bIndex) => {
+                enemies.forEach((enemy, eIndex) => {
+                    if (
+                        bullet.x < enemy.x + enemy.width &&
+                        bullet.x + 20 > enemy.x &&
+                        bullet.y < enemy.y + enemy.height &&
+                        bullet.y + 20 > enemy.y
+                    ) {
+                        bullets.splice(bIndex, 1);
+                        enemies.splice(eIndex, 1);
+                        enemies.push(createEnemy());
+                        score += 100;
+                        scoreDisplay.textContent = score;
+                    }
+                });
+            });
+        }
+        
+        function togglePause() {
+            isPaused = !isPaused;
+            pauseBtn.textContent = isPaused ? "Resume" : "Pause";
+        }
+        
+        function gameLoop() {
+            if (!isPaused) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawGun();
+                drawBullets();
+                drawEnemies();
+                checkCollisions();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+        
+        canvas.addEventListener("click", (e) => {
+            if (!isPaused) {
+                bullets.push({ x: gun.x + 15, y: gun.y });
+            }
+        });
+        
+        window.addEventListener("mousemove", (e) => {
+            if (!isPaused) {
+                gun.x = e.clientX - gun.width / 2;
+            }
+        });
+        
+        pauseBtn.addEventListener("click", togglePause);
+        
+        window.addEventListener("keydown", (e) => {
+            if (e.code === "Escape") {
+                togglePause();
+            }
+        });
+    </script>
+</body>
+</html>
+
+<!-- Deploy to Vercel:
+1. Create a vercel.json file in the root directory with:
+{
+  "version": 2,
+  "builds": [
+    { "src": "*.html", "use": "@vercel/static" }
+  ]
+}
+
+2. Push code to GitHub
+
+3. Go to vercel.com and:
+   - Create new project
+   - Import your GitHub repository
+   - Deploy
+
+The site will be live at: [your-project-name].vercel.app -->
