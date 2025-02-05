@@ -32,7 +32,8 @@
             cursor: pointer;
             font-size: 14px;
             border-radius: 5px;
-            margin-right: 20px;
+            margin: 0;
+
         }
         #pauseBtn {
             top: 20px;
@@ -44,8 +45,30 @@
         }
         #editVillainsBtn {
             top: 20px;
-            right: 230px;
+            right: 240px;
         }
+
+        @media (max-width: 768px) {
+            #gameUI {
+                top: auto;
+                bottom: 20px;
+                left: 20px;
+            }
+            #pauseBtn, #editCharacterBtn, #editVillainsBtn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            #pauseBtn {
+                right: 10px;
+            }
+            #editCharacterBtn {
+                right: 80px;
+            }
+            #editVillainsBtn {
+                right: 190px;
+            }
+        }
+
         .modal {
             position: fixed;
             top: 50%;
@@ -102,6 +125,26 @@
             bottom: 0;
             background: rgba(0, 0, 0, 0.7);
             z-index: 999;
+        }
+
+        @media (max-width: 768px) {
+            .modal {
+                width: 90%;
+                padding: 20px;
+                min-width: auto;
+            }
+            .character-grid, .villains-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            .character-option, .villain-option {
+                font-size: 30px;
+                padding: 8px;
+            }
+            .modal button {
+                padding: 8px 20px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -289,7 +332,7 @@
                         bullets.splice(bIndex, 1);
                         enemies.splice(eIndex, 1);
                         enemies.push(createEnemy());
-                        score += 100;
+                        score += 10;
                         scoreDisplay.textContent = score;
                     }
                 });
@@ -331,9 +374,17 @@
                 togglePause();
             }
         });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gun.y = canvas.height - 50; // Adjust gun position on resize
+        });
     </script>
 </body>
 </html>
+
 
 <!-- Deploy to Vercel:
 1. Create a vercel.json file in the root directory with:
