@@ -9,7 +9,7 @@
             margin: 0;
             overflow: hidden;
             background-color: #001133;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         canvas {
             display: block;
@@ -17,56 +17,98 @@
         }
         #gameUI {
             position: fixed;
-            top: 20px;
-            left: 20px;
+            top: 10px;
+            left: 10px;
             color: white;
-            font-size: 24px;
+            font-size: 18px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-        #pauseBtn, #editCharacterBtn, #editVillainsBtn {
-            position: fixed;
+            background: rgba(0, 0, 0, 0.3);
             padding: 8px 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            display: flex;
+            gap: 15px;
+        }
+        #timer {
+            color: #ffffff;
+            padding: auto;
+        }
+        #score {
+            color: #ffffff;
+        }
+        #pauseBtn {
+            position: fixed;
+            padding: 12px 25px;
             background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 25px;
+            margin: 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            top: 20px;
+            right: 80px;
+        }
+        #pauseBtn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Hamburger Menu Styles */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 900;
+        }
+        .hamburger-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+        }
+        .hamburger-btn span {
+            width: 20px;
+            height: 2px;
+            background-color: white;
+            transition: 0.3s;
+        }
+        .hamburger-content {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 10px;
+            padding: 10px;
+            display: none;
+            min-width: 150px;
+        }
+        .hamburger-content button {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
             border: none;
             color: white;
             cursor: pointer;
-            font-size: 14px;
+            text-align: left;
+            transition: 0.3s;
             border-radius: 5px;
-            margin: 0;
-
         }
-        #pauseBtn {
-            top: 20px;
-            right: 20px;
+        .hamburger-content button:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
-        #editCharacterBtn {
-            top: 20px;
-            right: 100px;
-        }
-        #editVillainsBtn {
-            top: 20px;
-            right: 240px;
-        }
-
-        @media (max-width: 768px) {
-            #gameUI {
-                top: auto;
-                bottom: 20px;
-                left: 20px;
-            }
-            #pauseBtn, #editCharacterBtn, #editVillainsBtn {
-                font-size: 12px;
-                padding: 6px 12px;
-            }
-            #pauseBtn {
-                right: 10px;
-            }
-            #editCharacterBtn {
-                right: 80px;
-            }
-            #editVillainsBtn {
-                right: 190px;
-            }
+        .hamburger-menu.active .hamburger-content {
+            display: block;
         }
 
         .modal {
@@ -74,48 +116,75 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 30px;
-            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 40px;
+            border-radius: 25px;
             text-align: center;
             color: white;
             z-index: 1000;
-            min-width: 300px;
+            min-width: 400px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .modal h2 {
+            margin-bottom: 30px;
+            font-size: 32px;
+            color: #4CAF50;
+        }
+        .game-over-modal {
+            text-align: center;
+        }
+        .game-over-modal h2 {
+            color: #ff4444;
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+        .final-score {
+            font-size: 36px;
+            margin: 30px 0;
+            color: #ffffff;
         }
         .character-grid, .villains-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin: 20px 0;
+            gap: 20px;
+            margin: 30px 0;
         }
         .character-option, .villain-option {
-            font-size: 40px;
-            padding: 10px;
+            font-size: 50px;
+            padding: 15px;
             cursor: pointer;
             border: 2px solid transparent;
-            border-radius: 10px;
+            border-radius: 15px;
             transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
         }
         .character-option:hover, .villain-option:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: white;
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
         }
         .character-option.selected, .villain-option.selected {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: #00ff00;
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4CAF50;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
         }
         .modal button {
-            padding: 10px 25px;
-            margin: 10px;
+            padding: 12px 30px;
+            margin: 15px;
             background: #4CAF50;
             border: none;
-            border-radius: 5px;
+            border-radius: 25px;
             color: white;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            font-weight: bold;
         }
         .modal button:hover {
             background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(69, 160, 73, 0.4);
         }
         #overlay {
             position: fixed;
@@ -123,41 +192,97 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 999;
+            backdrop-filter: blur(5px);
+        }
+        #timerInput {
+            padding: 20px;
+            font-size: 18px;
+            margin-top: 10px;
+            width: 100px;
+            margin: 10px;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            outline: none;
+        }
+        #timerInput:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+        .timer-container {
+            margin: 20px 0;
+        }
+        .timer-label {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #4CAF50;
         }
 
         @media (max-width: 768px) {
             .modal {
                 width: 90%;
-                padding: 20px;
+                padding: 30px;
                 min-width: auto;
             }
             .character-grid, .villains-grid {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
+                gap: 15px;
             }
             .character-option, .villain-option {
-                font-size: 30px;
-                padding: 8px;
+                font-size: 40px;
+                padding: 10px;
             }
             .modal button {
-                padding: 8px 20px;
+                padding: 10px 25px;
+                font-size: 16px;
+            }
+            #gameUI {
                 font-size: 14px;
+                padding: 5px 10px;
+            }
+            #pauseBtn {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+            .hamburger-menu {
+                right: 100px;
             }
         }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <div id="gameUI">Score: <span id="scoreDisplay">0</span></div>
+    <div id="gameUI">
+        <span id="score">Score: <span id="scoreDisplay">0</span></span>
+        <span id="timer">Time: <span id="timeDisplay">60</span>s</span>
+    </div>
     <button id="pauseBtn">Pause</button>
-    <button id="editCharacterBtn">Edit Character</button>
-    <button id="editVillainsBtn">Edit Villains</button>
+    
+    <div class="hamburger-menu">
+        <button class="hamburger-btn" onclick="toggleHamburger()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="hamburger-content">
+            <button onclick="showCharacterModal()">Edit Character</button>
+            <button onclick="showVillainsModal()">Edit Villains</button>
+        </div>
+    </div>
 
     <div id="overlay" style="display: none;"></div>
+    
+    <!-- Rest of the modals and content remain the same -->
     <div id="characterModal" class="modal" style="display: none;">
         <h2>Choose Your Character</h2>
+        <div class="timer-container">
+            <div class="timer-label">Set Game Duration (seconds):</div>
+            <input type="number" id="timerInput" min="10" max="300" value="60">
+        </div>
         <div class="character-grid">
             <div class="character-option" data-character="🛩️">🛩️</div>
             <div class="character-option" data-character="🚀">🚀</div>
@@ -187,6 +312,19 @@
     </div>
 
     <script>
+        // Add hamburger menu toggle function
+        function toggleHamburger() {
+            document.querySelector('.hamburger-menu').classList.toggle('active');
+        }
+
+        // Close hamburger menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.hamburger-menu')) {
+                document.querySelector('.hamburger-menu').classList.remove('active');
+            }
+        });
+
+        // Rest of the JavaScript remains the same
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         canvas.width = window.innerWidth;
@@ -197,6 +335,8 @@
         
         let selectedCharacter = '🛩️';
         let isGameStarted = false;
+        let timeLeft = 60;
+        let gameTimer;
         
         const gun = { 
             x: canvas.width / 2, 
@@ -207,20 +347,69 @@
         };
         
         let bullets = [];
-        let enemies = [createEnemy()];
+        let enemies = [createEnemy(), createEnemy()];
         let score = 0;
         let isPaused = false;
 
-        // Character and villain selection logic
         const characterModal = document.getElementById('characterModal');
         const villainsModal = document.getElementById('villainsModal');
         const overlay = document.getElementById('overlay');
         const startGameBtn = document.getElementById('startGameBtn');
-        const editCharacterBtn = document.getElementById('editCharacterBtn');
-        const editVillainsBtn = document.getElementById('editVillainsBtn');
         const saveVillainsBtn = document.getElementById('saveVillainsBtn');
         const characterOptions = document.querySelectorAll('.character-option');
         const villainOptions = document.querySelectorAll('.villain-option');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const timerInput = document.getElementById('timerInput');
+
+        function showGameOverModal() {
+            const gameOverModal = document.createElement('div');
+            gameOverModal.className = 'modal game-over-modal';
+            gameOverModal.innerHTML = `
+                <h2>Game Over!</h2>
+                <div class="final-score">Final Score: ${score}</div>
+                <button onclick="restartGame()">Play Again</button>
+            `;
+            document.body.appendChild(gameOverModal);
+            
+            const overlay = document.getElementById('overlay');
+            overlay.style.display = 'block';
+        }
+
+        function restartGame() {
+            // Remove game over modal
+            const gameOverModal = document.querySelector('.game-over-modal');
+            if (gameOverModal) {
+                gameOverModal.remove();
+            }
+            
+            // Reset game state
+            score = 0;
+            scoreDisplay.textContent = score;
+            bullets = [];
+            enemies = [createEnemy(), createEnemy()];
+            isPaused = false;
+            
+            // Show character selection modal to start new game
+            showCharacterModal();
+        }
+
+        function startTimer() {
+            timeLeft = parseInt(timerInput.value);
+            timeDisplay.textContent = timeLeft;
+            
+            gameTimer = setInterval(() => {
+                if (!isPaused) {
+                    timeLeft--;
+                    timeDisplay.textContent = timeLeft;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(gameTimer);
+                        isPaused = true;
+                        showGameOverModal();
+                    }
+                }
+            }, 1000);
+        }
 
         characterOptions.forEach(option => {
             option.addEventListener('click', () => {
@@ -258,6 +447,7 @@
             isPaused = false;
             if (!isGameStarted) {
                 isGameStarted = true;
+                startTimer();
                 gameLoop();
             }
         }
@@ -271,8 +461,6 @@
         }
 
         startGameBtn.addEventListener('click', hideModals);
-        editCharacterBtn.addEventListener('click', showCharacterModal);
-        editVillainsBtn.addEventListener('click', showVillainsModal);
         saveVillainsBtn.addEventListener('click', saveVillains);
 
         // Show character selection on initial load
@@ -284,7 +472,7 @@
                 y: 50,
                 width: 40,
                 height: 40,
-                speed: 2,
+                speed: 3,
                 emoji: selectedVillains[Math.floor(Math.random() * selectedVillains.length)]
             };
         }
@@ -375,31 +563,11 @@
             }
         });
 
-        // Handle window resize
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            gun.y = canvas.height - 50; // Adjust gun position on resize
+            gun.y = canvas.height - 50;
         });
     </script>
 </body>
 </html>
-
-
-<!-- Deploy to Vercel:
-1. Create a vercel.json file in the root directory with:
-{
-  "version": 2,
-  "builds": [
-    { "src": "*.html", "use": "@vercel/static" }
-  ]
-}
-
-2. Push code to GitHub
-
-3. Go to vercel.com and:
-   - Create new project
-   - Import your GitHub repository
-   - Deploy
-
-The site will be live at: [your-project-name].vercel.app -->
